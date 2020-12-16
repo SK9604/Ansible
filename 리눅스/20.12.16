@@ -1,0 +1,1478 @@
+## 🙋🏻‍♀️ 열일곱번째 비대면 수업
+
+---
+
+# 내용 정리
+
+---
+
+# 리눅스 서버 설계
+
+## 리눅스 서버를 설치하기 위한 계획
+
+### 클라이언트 측에서 요청하는 사항
+
+---
+
+시스템명 :
+
+설치 일자:
+
+설치 엔지니어 :
+
+### H/W
+
+랙 유무 :
+
+HDD :
+
+MEM :
+
+NIC :
+
+CPU :
+
+### N/W
+
+IP :
+GW:
+
+DNS:
+
+### S/W
+
+OS :
+
+kernel :
+
+설치될 프로그램 : 
+
+계획 → 예산할당 → 구매 → [클라우드] → 프로그램 → 테스트
+
+물리서버 / 클라우드
+
+서버에서 사용되는 사용자 예측이 힘듬
+
+서버 스펙을 가늠하기 힘들 때 → 클라우드 선택
+
+## OS:
+
+파티션 계획 : 
+
+```bash
+/
+/boot : 2G 
+/var  : 50% 
+/etc  : 10% ~ 15%  
+/home : 보통의 경우에는 nfs 등 네트워크 파일 시스템 이용 (5G)
+swap  :
+시스템의 RAM 용량	     권장 스왑 공간 용량
+4GB 이하 RAM	         최소 2GB의 스왑 공간
+4GB에서 16GB RAM	     최소 4GB 스왑 공간
+16GB에서 64GB 램	     최소 8GB 스왑 공간
+64GB에서 256GB 램	     최소 16GB 스왑 공간
+256GB부터 512GB 램	   최소 32GB 스왑 공간
+```
+
+F/S LVM  표준FS xfs< 
+
+
+# 디렉토리 구조
+
+# 단원 목표
+
+---
+
+- 디렉토리 구조와 용도
+
+---
+
+# 디렉토리 구조와 용도
+
+---
+
+- 시스템 디렉토리
+
+    운영체제 전반에 관여를 하고 안정적인 운영을 하기 위해 존재하는 디렉토리다.
+
+- 데이터 디렉토리
+
+    사용자 데이터를 저장하기 위한 공간
+
+```bash
+# ls /
+backup  boot   data2  data4  etc   lib    media  opt   root  sbin  sys   tmp  var
+bin     data1  data3  dev    home  lib64  mnt    proc  run   srv   test  usr
+```
+
+---
+
+리눅스의 디렉토리 구조는 전체적으로 **트리(Tree) 구조를** 하고 있으며, 명령어의 성격과 내용 및 사용 권한 등에 따라 디렉토리로 구분되어 있다. 
+
+리눅스 파일 시스템 구조는 기본적인 구조를 제외하고는 사용자의 설정에 따라 달라질 수 있다. 하지만 리눅스의 디렉토리 구조는 **파일 시스템 표준안(FSSTND, Linux File System Standard)**을 기반으로 하는 것이 바람직하다. 표준안을 무조건 따르라는 강제력은 없지만 리눅스 파일 시스템 표준안을 따라 파일 시스템을 구성할 경우 `파일들의 위치가 일관되게 유지되어 프로그램 작성, 포팅은 물론 시스템 관리도 쉬워지는 이점이 있기 때문에 대부분의 배포판들이 이 표준안을 지키고 있다.`
+
+대부분의 리눅스는 FHS(Filesystem Hierarchy Standard) 표준 파일 시스템 계층을 사용하고 같은 목적의 파일들을 같은 장소에 일관되게 모아 관리하므로 시스템 자원이나 프로그램들을 쉽게 찾을 수 있다. 다시 말하자면 명령어, 파일 그리고 문서들이 제각기 독립된 장소에서 관리된다. 그럼 각 디렉토리에 대해 자세히 살펴보면서 알아보겠다.
+
+```bash
+디렉토리명    설     명
+/          리눅스 파일 시스템 체계의 최상위 디렉토리 /(루트)이다. 
+           리눅스의 모든 디렉토리들의 시작점이며 , 모든 디렉토리는 절대 경로를 표시 할 때에 이 디렉토리부터 시작한다.
+           / - 가장 최상위 디렉토리 
+           모든 파일시스템의 마운트 포인터가 존재, 모든 파일시스템의 이름(Name Space)이 존재
+/root      시스템 관리자(예: root 사용자)의 홈 디렉토리
+					 이전 UNIX계열에서는 root의 홈 디렉토리를 /로 사용하였지만 리눅스는 /root를 관리자의 홈 디렉토리로 사용한다.
+/bin       기본 명령어들이 모여 있는 디렉토리 **centos 7 부터는 /usr/bin으로 링크되어 있다.** 
+/etc       각종 **환경 설정**에 연관된 파일들과 디렉토리들을 가진 디렉토리 시스템 환경설정 파일, 서비스 구성 설정 파일, 사용자/그룹 정보 파일, ....
+/boot      리눅스의 커널이 저장되어 있는 디렉토리
+/mnt       외부 장치인 플로피 디스크, CD-ROM, Samba 등을 마운트하기 위해서 제공되는 디렉토리
+/usr       대부분의 프로그램이 설치되어 있는 디렉토리공유할 수 있는 디렉토리와 파일들
+/lib       프로그램들의 각종 라이브러리들이 존재 커널 모듈 파일과 라이브러리 파일들이 존재한다. 
+           **CentOS7부터는 /usr/lib으로 링크되어 있다.** 64bit의 경우는 /lib64로 링크되어 있으며 /usr/lib64로 링크되어 있다.
+/home      시스템 계정 사용자들이 홈 디렉토리
+/dev       시스템의 각종 디바이스 목록
+/proc      /proc 디렉토리에는 시스템의 각종 프로세스 프로그램 정보 그리고 하드웨어적인 정보들이 저장
+/var       시스템에서 사용되는 가변적인 파일들이 저장 스풀, 로그, 캐싱
+/tmp       임시 파일들을 위한 디렉토리
+```
+
+■ /(root) 디렉토리
+
+일반적으로 루트 디렉토리라고 부르는 리눅스 시스템에서 가장 최상위 디렉토리이며 디렉토리 구조의 시작이다. 시스템 관리자의 홈 디렉토리인 /root 디렉토리와는 별개이며 다른 것이다.'/'디렉토리를 제외한 디렉토리인 /bin, /etc, /boot, /mnt, /usr, /lib, /home, /dev, /proc, /var, /sbin, /tmp, /root /lost+found, 는 '/'디렉토리 안에 존재한다.
+
+```bash
+# ls /
+backup  boot   data2  data4  etc   lib    media  opt   root  sbin  sys   tmp  var
+bin     data1  data3  dev    home  lib64  mnt    proc  run   srv   test  usr
+
+# tree / | more
+```
+
+■ /root 디렉토리
+
+시스템 관리자(EX: root)의 홈 디렉토리이다. root 사용자의 환경파일(.bash_profile, .bashrc)이나 또는 운영체제 설치시의 기록(install.log, anaconda-ks.cfg)들이 들어 있다.
+
+```bash
+# ls -a /root
+./             .bashrc    .gnome2/           .recently-used.xbel  Desktop/
+../            .cshrc     .gnome2_private/   .redhat/             anaconda-ks.cfg
+.ICEauthority  .dmrc      .gstreamer-0.10/   .scim/               install.log
+.Trash/        .eggcups/  .gtkrc-1.2-gnome2  .ssh/                install.log.syslog
+.bash_history  .gconf/    .lesshst           .tcshrc
+.bash_logout   .gconfd/   .metacity/         .viminfo
+.bash_profile  .gnome/    .nautilus/         .xsession-errors
+```
+
+**■ /bin 디렉토리**
+
+binaries의 약어로 이진 파일들이며 리눅스에서 가장 기본이 되는 명령어들이 모여 있는 디렉토리이다. 해당 디렉토리 안을 들여다보면 대부분의 파일들이 녹색으로 구성된 파일 이 실행 파일임을 알 수 있다.
+
+특히 이곳에는 부팅에 필요한 명령어들이 위치하며 부팅 후에 시스템의 계정 사용자들이 사용할 수 있는 일반적인 명령어들도 위치하고 있다.
+
+```bash
+# ls /bin
+alsacard*              dmesg*          kill*             pgawk*            tar*
+alsaunmute*            dnsdomainname@  ksh@              ping*             taskset*
+arch*                  doexec*         ksh93*            ping6*            tcptraceroute@
+awk@                   domainname@     link*             ps*               tcsh*
+basename*              dumpkeys*       ln*               pwd*              touch*
+bash*                  echo*           loadkeys*         raw*              tracepath*
+cat*                   ed*             loadkeys.static*  red@              tracepath6*
+chgrp*                 egrep@          logger*           redhat_lsb_init*  traceroute*
+chmod*                 env*            login*            rm*               traceroute6@
+chown*                 ex@             ls*               rmdir*            tracert@
+cp*                    false*          mail*             rpm*              true*
+..... (중략) .....
+```
+
+**■** /bin - 사용자가 사용하는 명령어 (EX: ls, cp, mv, rm, ...)
+
+■ /sbin - 관리자가 사용하는 명령어 (EX: fsck, fdisk, ....)
+
+```bash
+# find / -name bin -type d
+# find / -name sbin -type d
+```
+
+**■ /etc 디렉토리**
+
+/etc 디렉토리는 리눅스에서 없어서는 안 될 디렉토리이며, 리눅스 시스템에 관한 각종 환경 설정에 연관된 파일들과 디렉토리들을 가진 디렉토리이다. 이 디렉토리에 있는 대부분의 파일들은 시스템 관리자에 의해서 관리되는 파일들이다.
+
+웹 서버 환경 설정, 시스템 계정 사용자 정보, 패스워드 관리, 시스템의 파일 시스템 관리 파일, 여러 가지 시스템 보안에 관련된 파일들, 시스템 초기화 설정 파일, TCP/IP 설정 파일 등 시스템 전반에 걸친 거의 모든 환경 설정 파일들이 모두 이 디렉토리 안에 저장되어 있다.
+
+다음은 /etc 파일 안에 존재하는 중요 디렉토리에 대한 설명이다.
+
+```bash
+① /etc/rc.d 디렉토리
+시스템의 부팅과 시스템 실행 레벨 변경 시에 실행되는 스크립트들이 저장되어 있는 디렉토리이다. 리눅스의 6가지 실행 레벨별로 각각의 해당 디렉토리가 있는 것을 볼 수 있을 것이다.
+
+# ls /etc/rc.d
+init.d  rc.local  rc0.d  rc1.d  rc2.d  rc3.d  rc4.d  rc5.d  rc6.d
+② /etc/shadow 파일
+/etc/passwd 파일에서 패스워드 부분만을 따로 저장하는 파일이다. 이 파일에 패스워드는 암호화 되어 shadow 패스워드 형태로 저장되어 있으며 시스템 관리자만이 접근할 수 있기 때문에 크래킹 등에 대한 우려가 상대적으로 적다.
+
+③ /etc/group 파일
+시스템의 그룹에 대한 정보를 저장하고 있는 파일이다.
+
+④ /etc/inittab 파일
+init 데몬이 읽어 들이는 설정하는 파일이다.
+현재는 systemd의 target 명령어를 사용하여 런레벨을 systemd에서 제어한다. 
+
+⑤ /etc/issue, /etc/issue.net 파일
+getty에 의해서 로그인을 위한 프롬프트가 뜨기 전에 출력되는 메시지를 설정하는 파일이다. 리눅스 시스템으로 접속할 경우 가장 처음으로 볼 수 있는 메시지이다. 보통 시스템에 대한 설명과 각종 환영 메시지를 전달하기 위해서 사용된다. /etc/issue 파일의 내용은 보통 시스템의 터미널에서 볼 수 있다. 그리고 /etc/issue.net 파일의 내용은 리모트 상에서 시스템으로 접속할 경우 볼 수 있을 것이다.
+
+# cat /etc/issue.net
+\S
+Kernel \r on an \m
+# telnet localhost
+Trying ::1...
+Connected to localhost.
+Escape character is '^]'.
+
+Kernel 3.10.0-862.el7.x86_64 on an x86_64
+⑥ /etc/profile, /etc/csh.login, /etc/csh.cshrc 파일
+시스템이 시작될 때 사용자가 로그인을 할 때 본(Bourne) 셸이나 C셸에 의해서 실행되는 스크립트 파일이다. 일반적으로 사용자들에 대한 기본 환경 설정에 사용된다.
+
+⑦ /etc/securetty 파일
+/etc/securetty 파일에는 시스템 관리자(예: root)가 시스템에 로그인할 수 있는 안전한 터미널에 대한 정보가 저장되어 있다. 일반적으로 가상 콘솔이 설정되어 있다. 이것은 네트워크를 통해 시스템으로 침입해 시스템 관리자의 권한을 획득하는 크래킹을 막기 위해서이다.
+
+⑧ /etc/shells 파일
+/etc/shells 파일은 시스템에서 안정적으로 사용할 수 있는 셸에 대한 정보를 저장하고 있는 파일이다. 만약 chsh 명령을 사용해서 사용 중인 셸을 바꾸려면 이 파일에 저장되어 있는 셸 중에 하나를 선택해야 한다. 또한 ftp 데몬의 경우에는 사용자의 셸을 검사하여 /etc/shells에 저장되어 있지 않은 셸을 사용한다면 로그인을 허용하지 않는다.
+
+# cat /etc/shells
+/bin/sh
+/bin/bash
+/sbin/nologin
+/usr/bin/sh
+/usr/bin/bash
+/usr/sbin/nologin
+/bin/tcsh
+/bin/csh
+```
+
+**■ /boot 디렉토리**
+
+리눅스의 커널이 저장되어 있는 디렉토리로서 각종 리눅스 Boot에 필요한 Booting 지원 파일들이 저장되어 있는 디렉토리이다. 디렉토리 안을 살펴보면 vmlinuz라는 커널도 볼 수 있다.
+
+```bash
+# ls -l /boot
+-rw-------. 1 root root  3409143 Apr 21  2018 System.map-3.10.0-862.el7.x86_64
+-rw-r--r--. 1 root root   147819 Apr 21  2018 config-3.10.0-862.el7.x86_64
+drwxr-xr-x. 3 root root       17 Mar 17 18:44 efi
+drwxr-xr-x. 2 root root       27 Mar 17 18:44 grub
+drwx------. 5 root root       97 Mar 17 18:53 grub2
+-rw-------. 1 root root 74035047 Mar 17 18:50 initramfs-0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b.img
+-rw-------. 1 root root 29152809 Mar 17 18:53 initramfs-3.10.0-862.el7.x86_64.img
+-rw-r--r--. 1 root root   304926 Apr 21  2018 symvers-3.10.0-862.el7.x86_64.gz
+-rwxr-xr-x. 1 root root  6224704 Mar 17 18:50 vmlinuz-0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b
+-rwxr-xr-x. 1 root root  6224704 Apr 21  2018 vmlinuz-3.10.0-862.el7.x86_64
+# cat /boot/grub/grub.conf   (# cat /etc/grub.conf)
+#
+# DO NOT EDIT THIS FILE
+#
+# It is automatically generated by grub2-mkconfig using templates
+# from /etc/grub.d and settings from /etc/default/grub
+#
+
+### BEGIN /etc/grub.d/00_header ###
+set pager=1
+
+if [ -s $prefix/grubenv ]; then
+  load_env
+fi
+if [ "${next_entry}" ] ; then
+   set default="${next_entry}"
+   set next_entry=
+   save_env next_entry
+   set boot_once=true
+else
+   set default="${saved_entry}"
+fi
+
+if [ x"${feature_menuentry_id}" = xy ]; then
+  menuentry_id_option="--id"
+else
+  menuentry_id_option=""
+fi
+
+export menuentry_id_option
+
+if [ "${prev_saved_entry}" ]; then
+  set saved_entry="${prev_saved_entry}"
+  save_env saved_entry
+  set prev_saved_entry=
+  save_env prev_saved_entry
+  set boot_once=true
+fi
+
+function savedefault {
+  if [ -z "${boot_once}" ]; then
+    saved_entry="${chosen}"
+    save_env saved_entry
+  fi
+}
+
+function load_video {
+  if [ x$feature_all_video_module = xy ]; then
+    insmod all_video
+  else
+    insmod efi_gop
+    insmod efi_uga
+    insmod ieee1275_fb
+    insmod vbe
+    insmod vga
+    insmod video_bochs
+    insmod video_cirrus
+  fi
+}
+
+terminal_output console
+if [ x$feature_timeout_style = xy ] ; then
+  set timeout_style=menu
+  set timeout=5
+# Fallback normal timeout code in case the timeout_style feature is
+# unavailable.
+else
+  set timeout=5
+fi
+### END /etc/grub.d/00_header ###
+
+### BEGIN /etc/grub.d/00_tuned ###
+set tuned_params=""
+set tuned_initrd=""
+### END /etc/grub.d/00_tuned ###
+
+### BEGIN /etc/grub.d/01_users ###
+if [ -f ${prefix}/user.cfg ]; then
+  source ${prefix}/user.cfg
+  if [ -n "${GRUB2_PASSWORD}" ]; then
+    set superusers="root"
+    export superusers
+    password_pbkdf2 root ${GRUB2_PASSWORD}
+  fi
+fi
+### END /etc/grub.d/01_users ###
+
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'CentOS Linux (3.10.0-862.el7.x86_64) 7 (Core)' --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulinux-3.10.0-862.el7.x86_64-advanced-ec7d3c20-ea25-4627-b48f-da5af644bd13' {
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_msdos
+insmod xfs
+set root='hd0,msdos8'
+if [ x$feature_platform_search_hint = xy ]; then
+  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos8 --hint-efi=hd0,msdos8 --hint-baremetal=ahci0,msdos8 --hint='hd0,msdos8'  ec7d3c20-ea25-4627-b48f-da5af644bd13
+else
+  search --no-floppy --fs-uuid --set=root ec7d3c20-ea25-4627-b48f-da5af644bd13
+fi
+linux16 /boot/vmlinuz-3.10.0-862.el7.x86_64 root=UUID=ec7d3c20-ea25-4627-b48f-da5af644bd13 ro rhgb quiet LANG=ko_KR.UTF-8
+initrd16 /boot/initramfs-3.10.0-862.el7.x86_64.img
+}
+menuentry 'CentOS Linux (0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b) 7 (Core)' --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option 'gnulinux-0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b-advanced-ec7d3c20-ea25-4627-b48f-da5af644bd13' {
+load_video
+insmod gzio
+insmod part_msdos
+insmod xfs
+set root='hd0,msdos8'
+if [ x$feature_platform_search_hint = xy ]; then
+  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,msdos8 --hint-efi=hd0,msdos8 --hint-baremetal=ahci0,msdos8 --hint='hd0,msdos8'  ec7d3c20-ea25-4627-b48f-da5af644bd13
+else
+  search --no-floppy --fs-uuid --set=root ec7d3c20-ea25-4627-b48f-da5af644bd13
+fi
+linux16 /boot/vmlinuz-0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b root=UUID=ec7d3c20-ea25-4627-b48f-da5af644bd13 ro rhgb quiet
+initrd16 /boot/initramfs-0-rescue-bcaf91e77cfa40feb7a1aff4cf3dfe9b.img
+}
+
+### END /etc/grub.d/10_linux ###
+
+### BEGIN /etc/grub.d/20_linux_xen ###
+### END /etc/grub.d/20_linux_xen ###
+
+### BEGIN /etc/grub.d/20_ppc_terminfo ###
+### END /etc/grub.d/20_ppc_terminfo ###
+
+### BEGIN /etc/grub.d/30_os-prober ###
+### END /etc/grub.d/30_os-prober ###
+
+### BEGIN /etc/grub.d/40_custom ###
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+### END /etc/grub.d/40_custom ###
+
+### BEGIN /etc/grub.d/41_custom ###
+if [ -f  ${config_directory}/custom.cfg ]; then
+  source ${config_directory}/custom.cfg
+elif [ -z "${config_directory}" -a -f  $prefix/custom.cfg ]; then
+  source $prefix/custom.cfg;
+fi
+### END /etc/grub.d/41_custom ###
+```
+
+**■ /mnt 디렉토리**
+
+외부 장치인 플로피 디스크, CD-ROM, Samba 등을 마운트하기 위해서 제공되는 디렉토리이다. 이 디렉토리는 임시로 사용되는 디렉토리이므로 프로그램은 /mnt 디렉토리에 어떠한 파일 시스템이 마운트 되었는지 자동으로 인식하지 않는다. 또한 /mnt는 보통 여러 개의 하위 디렉토리로 나누어 사용하며, 평소에는 /mnt 디렉토리의 각 디렉토리들은 비어 있는 상태이다.
+
+**■ /usr 디렉토리**
+
+이 디렉토리 역시 가장 중요한 디렉토리 중 하나로 사용하면서 공유할 수 있는 디렉토리와 파일들을 가지고 있다. 즉, 시스템에 사용되는 각종 응용 프로그램들이 설치되는 디렉토리이다. 거의 모든 프로그램과 그에 관련된 명령어 및 라이브러리들이 이 디렉토리에 위치하게 된다. 또한 X 시스템 관련 파일들과 리눅스 커널 소스, 각종 C언어 관련 헤더파일 등도 이 디렉토리 안에 저장되어 있고, 이 디렉토리 아래에 존재하는 하위 디렉토리에 대해 간략하게 설명하겠다.
+
+**① /usr/bin 디렉토리**
+
+리눅스 시스템에서 사용되는 각종 프로그램들이 저장되어 있으며 /bin 디렉토리에는 없는 다양한 실행 파일들이 저장되어 있는 디렉토리이다.
+
+**② /usr/X11R6 디렉토리**
+
+X 윈도우 시스템에 사용되는 모든 파일들이 이 디렉토리 안에 저장된다. 이 디렉토리는 X 윈도우 시스템의 개발과 설치를 좀 더 쉽게 하기 위해서 전체 시스템 디렉토리 구조에 통합되지 않고 독자적인 구조를 가진다.
+
+**③ /usr/etc 디렉토리**
+
+/etc 디렉토리에는 각종 환경 설정 파일들이 있듯이 이곳에도 여러 가지 시스템 환경 설정파일들이 저장되어 있다. 하지만 이곳에 있는 파일들은 /etc 디렉토리 안의 파일들과는 달리 꼭 필요한 파일들은 아니다.
+
+**④ /usr/sbin 디렉토리**
+
+시스템 관리자를 위한 명령어들이 저장되어 있는 디렉토리이다. 보통 이 디렉토리의 명령어들은 루트 파일 시스템에는 있을 필요가 없는 서버 프로그램들이 저장된다.
+
+**⑤ /usr/include 디렉토리**
+
+C 언어 관련 헤더파일들이 저장되어 있는 디렉토리이다.
+
+**⑥ /usr/lib 디렉토리**
+
+각종 라이브러리들이 저장되어 있는 디렉토리이다. 만약 사용자가 직접 작성한 프로그램을 컴파일 한다면 해당 프로그램은 /usr/lib 디렉토리의 파일에 Link된다. 또한 이 라이브러리 안에 실행 코드가 필요하다면 /lib 디렉토리를 참조한다.
+
+**⑦ /usr/local 디렉토리**
+
+시스템의 특징적인 프로그램들이 저장되는 디렉토리이다. 여기서 **특징적인 프로그램은 시스템 관리자에 의해서 따로 설치되는 프로그램**들을 말한다. 그러므로 시스템마다 각각의 특징을 가지므로 시스템마다 이 디렉토리에 저장되어 있는 내용들은 모두 다를 것이다. 하지만 이 디렉토리는 시스템에 꼭 필요한 디렉토리는 아니다.
+
+**⑧ /usr/share/man 디렉토리**
+
+man 페이지의 실제 내용들이 저장되어 있는 디렉토리이다. 디렉토리를 살펴보면 man1, man2, man3 등과 같이 여러 개의 디렉토리들로 나누어져 있는 모습을 볼 수 있을 것이다. 이는 예를 들어 man1 디렉토리는 섹션 1의 man 페이지 소스를 위한 디렉토리를 의미한다.
+
+**⑨ /usr/src 디렉토리**
+
+시스템에서 사용하는 각종 프로그램들의 컴파일 되지 않는 소스 파일들이 저장되어 있는 디렉토리이다. /usr/src 디렉토리에서 한 번 살펴본 곳은 /usr/src/linux 디렉토리이다. 이 디렉토리가 바로 리눅스의 커널 소스를 저장하고 있는 디렉토리이기 때문이다.
+
+**⑩ /usr/share/info 디렉토리**
+
+GNU Info 문서들을 저장하고 있는 디렉토리이다.
+
+**⑪ /usr/share/doc 디렉토리**
+
+각종 문서들이 저장되어 있는 디렉토리이다.
+
+**■ /lib 디렉토리**
+
+/lib 디렉토리에는 프로그램들의 각종 라이브러리들이 존재한다. 대부분 공유 라이브러리로 더 편리하게 사용할 수 있으며, 파일 크기를 줄여서 실행할 때 불러 사용하게 된다.
+
+```bash
+# ls /lib
+bdevid/                                 libgobject-2.0.so.0@
+cpp@                                    libgobject-2.0.so.0.1200.3*
+dbus-1/                                 libgthread-2.0.so.0@
+device-mapper/                          libgthread-2.0.so.0.1200.3*
+firmware/                               libiw.so.28*
+i686/                                   libkeyutils-1.2.so*
+iptables/                               libkeyutils.so.1@
+kbd/                                    liblvm2cmd.a
+ld-2.5.so*                              liblvm2cmd.so@
+ld-linux.so.2@                          liblvm2cmd.so.2.02*
+ld-lsb.so.3@                            libm-2.5.so*
+libBrokenLocale-2.5.so*                 libm.so.6@
+libBrokenLocale.so.1@                   libnsl-2.5.so*
+..... (중략) .....
+```
+
+```bash
+① /lib/modules 디렉토리
+/lib/modules 디렉토리에는 커널로 로딩 가능한 커널 모듈들이 저장되어 있다.
+
+# cd /lib/modules 
+# cd 2.6.18-164.el5 
+# ls
+build@   misc/           modules.dep          modules.isapnpmap  modules.seriomap  source@
+extra/   modules.alias   modules.ieee1394map  modules.ofmap      modules.symbols   updates/
+kernel/  modules.ccwmap  modules.inputmap     modules.pcimap     modules.usbmap    
+weak-updates/
+```
+
+**■ /home 디렉토리**
+
+/home 디렉토리에는 시스템 계정 사용자들이 홈 디렉토리가 저장된다. 이곳의 디렉토리와 파일들은 시스템에서 사용되지 않는다. 단지 리모트 상에서 시스템으로 접속을 하는 사용자들을 위한 공간이다.
+
+```bash
+fedora/  lost+found/  user01/  user02/
+```
+
+**■ /dev 디렉토리**
+
+/dev 디렉토리에는 시스템의 각종 디바이스들의 목록이 들어 있는 디렉토리이다. 디렉토리를 살펴보면 많은 파일들이 위치하고 있는 것을 볼 수 있다. 하지만 이 디렉토리는 물리적인 용량은 갖지 않는 가상 디렉토리이다. 대표적으로 하드 드라이브, 플로피, CD-ROM 그리고 루프백 장치 등이 존재한다. 리눅스 시스템은 윈도와 달리 각종 디바이스 장치들을 하나의 파일로 취급한다. 따라서 시스템은 각각의 장치로부터의 정보를 /dev 디렉토리에 존재하는 해당 장치 파일로부터 가져온다.
+
+Device Files
+
+- Block Device File(EX: ls -l /dev | grep '^b')
+
+- Character Device (EX: ls -l /dev | grep '^c')
+
+```bash
+[EX] Disk Device File
+# ls -l /dev/sd? 
+# ls -l /dev/hd?
+```
+
+```bash
+① /dev/console 디바이스 파일
+시스템 콘솔이다.
+
+② /dev/hda 디바이스 파일
+시스템 하드 디스크(IDE 방식의 디스크)이다. 여기서 /dev/hda는 첫 번째 하드 디스크를 의미한다. /dev디렉토리를 살펴보면 /dev/hda1, /dev/hda2 등의 파일들을 볼 수 있을 것이다. 이는 첫 번째 하드 디스크의 첫 번째 파티션, 두 번째 파티션 등을 의미한다. 만약 시스템에 여러 개의 하드 디스크가 장착되어 있다면 /dev/hdb, /dev/hdc 등의 파일들도 /dev/hda1. /dev/hda2 등과 같은 형식으로 저장되어 있는 모습을 볼 수 있다.
+
+③ /dev/sda 디바이스 파일
+시스템 하드 디스크(SCSI 방식의 디스크)들이다. 만약 시스템에 SCSI 하드 디스크를 장착했다면 시스템은 /dev/hda 등과 같은 파일들 대신 /dev/sda 파일에서 정보를 얻어 장치에 접근할 것이다.
+
+④ /dev/lp 디바이스 파일
+시스템의 병렬 포트 장치들이다.
+
+⑤ /dev/ttyS 디바이스 파일
+/dev/ttyS는 직렬 포트 장치이다.
+
+⑥ /dev/null, /dev/zero 다바이스 파일
+/dev/null, /dev/zero은 블랙홀이라고도 부르는 특별한 장치이다. 이 장치로 데이터 등을 보내면 모두 폐기되므로 주의해야 할 것이다.
+
+⑦ /dev/pts 디렉토리
+시스템으로의 원격 접속을 위한 'pesudo_terminal'들이다. 만약 시스템 계정 사용자들이 원격지에서 시스템으로 Telnet 등을 이용하여 시스템에 접속을 시도한다면 이들은 /dev/pts 디바이스들을 사용하게 되는 것이다.
+
+⑧ /dev/tty 디바이스 파일
+시스템의 가상 콘솔(Virtual Console)들이다. 이 가상 콘솔의 기능은 하나의 화면에 여러 개의 콘솔들을 만든다. 만약 사용자가 시스템 앞에 앉을 수 있다면 Alt +F1, Alt + F2 등을 이용하여 리눅스에서 제공하는 여러 개의 가상 콘솔을 직접 볼 수 있을 것이다.
+```
+
+**■ /proc 디렉토리**
+
+/proc 디렉토리에는 시스템의 각종 프로세서, 프로그램 정보 그리고 하드웨어적인 정보들이 저장된다. 이 디렉토리는 가상 파일 시스템으로 /dev 디렉토리와 마찬가지로 하드디스크 상에 물리적인 용량을 갖지 않는다. 즉, 실제로 존재하지 않는다는 것이다. 또한 이 디렉토리에 존재하는 파일들은 실제 하드 디스크에 저장되지 않고 커널에 의해서 메모리에 저장된다. 그러므로 그 디렉토리 안의 파일들은 현재의 시스템 설정을 보여주는 것이다. 다음은 /proc 디렉토리에 대해 하부 디렉토리에 대한 설명이다.
+
+```bash
+① /proc/partitions파일
+이 파일은 하드디스크 분할영역 상태에 대한 정보를 표시한다.
+
+# cat /proc/partitions      /* 관련된 명령어 : fdisk -l, df -h, free */
+major minor  #blocks  name
+
+   8     0   31457280 sda
+   8     1   27832581 sda1
+   8     2    1052257 sda2
+   8     3     514080 sda3
+   8     4          1 sda4
+   8     5     514048 sda5
+   8     6     514048 sda6
+   8     7     514048 sda7
+   8     8     514048 sda8
+② /proc/filesystems 파일
+시스템에 설정되어 있는 파일 시스템에 대한 정보를 저장하고 있는 파일이다.
+
+# cat /proc/filesystems
+nodev   sysfs
+nodev   rootfs
+nodev   bdev
+nodev   proc
+nodev   cpuset
+nodev   binfmt_misc
+nodev   debugfs
+nodev   securityfs
+nodev   sockfs
+nodev   usbfs
+nodev   pipefs
+nodev   anon_inodefs
+nodev   futexfs
+nodev   tmpfs
+nodev   inotifyfs
+nodev   eventpollfs
+nodev   devpts
+        ext2
+nodev   ramfs
+nodev   hugetlbfs
+        iso9660
+nodev   mqueue
+        ext3
+nodev   vmhgfs
+nodev   vmblock
+nodev   rpc_pipefs
+nodev   autofs
+③ /proc/swaps 파일
+스왑 정보를 알 수 있다.  리눅스를 설치하면서 설정한 스왑 파티션 외에 리눅스 시스템이 사용하고 있는 스왑 파일에 대한 정보도 알 수 있습니다.
+
+# cat /proc/swaps      /* 관련 명령어 : free */
+Filename                                Type            Size    Used    Priority
+/dev/sda2                               partition       1052248 88      -1
+④ /proc/version 파일  /* # uname -a */
+이 파일은 리눅스 커널의 버전을 알려 준다. 레드햇 리눅스는 최신의 커널인 커널 2.6을 사용하고 있는 것을 확인할 수 있다.
+
+# cat /proc/version    /* # dmesg | grep -i version */
+Linux version 2.6.18-164.el5 (mockbuild@builder16.centos.org) (gcc version 4.1.2 20080704 (Red Hat 4.1.2-46)) #1 SMP Thu Sep 3 03:33:56 EDT 2009
+⑤ /proc/devices 파일
+현재 리눅스 커널에 설정되어 있는 하드웨어의 목록을 볼 수 있다. /dev에 있는 파일들의 정보를 확인 하는 것과 같다. 리눅스는 두 가지 종류의 하드웨어 디바이스를 인식한다. 하나는 디스크와 같은 블록 디바이스와 프린터, 모뎀과 같은 캐릭터 디바이스이다.
+
+# cat /proc/devices
+Character devices:
+  1 mem
+  4 /dev/vc/0
+  4 tty
+  4 ttyS
+....
+Block devices:
+  1 ramdisk
+  2 fd
+  8 sd
+  9 md
+....
+# ls -l /dev | grep '^c'
+# ls -l /dev | grep '^b'
+
+⑥ /proc/ioports 파일
+현재 어느 I/O 포트가 사용 중인지를 확인 할 때 사용한다. IRQ의 경우처럼 I/O 포트 역시 하드웨어끼리 충돌이 있어서는 안 된다.
+ 
+# cat /proc/ioports
+0000-001f : dma1
+0020-0021 : pic1
+0040-0043 : timer0
+0050-0053 : timer1
+```
+
+[참고] IRQ (interrupt request)의 개념
+
+```bash
+IRQ[아이알큐] 값은 자신의 운영에 관하여 신호를 보내오는 주변장치들을 식별하기 위해 각 주변장치 별로 미리 할당해 놓은 장소이다. 예를 들어 프린터는 출력이 끝나면 인터럽트 신호를 컴퓨터에 보내는데, 그 신호는 다음에 어떤 일을 할 것인지를 결정하도록, 아주 짧은 시간동안 컴퓨터가 하던 일을 멈추게 한다. 여러 개의 신호들이 같은 인터럽트 회선을 통해 들어오기 때문에, 컴퓨터가 이를 구분하기 위해서는 각 주변장치들과 컴퓨터로 통하는 회로마다 고유한 값을 지정할 필요가 있다. PnP 장치가 나오기 이전에는 컴퓨터에 새로운 주변장치를 추가할 때마다 IRQ 값을 사용자가 일일이 지정해야만 했었다. 
+
+만약 PnP를 지원하지 않는 주변장치를 추가로 설치해야 한다면, 아마도 제작자는 그것의 IRQ 값을 어떻게 설정하는지에 대해 뚜렷한 지침을 설치설명서 등에 제공해 줄 것이다. 그러나, 이러한 자료도 없고 설정해야할 IRQ 값에 대해 잘 알지 못하고 있다면, 그 제품을 만든 회사의 기술지원센터에 전화로 문의하는 것이 시간을 절약하는 길이기도 하다.
+```
+
+```bash
+⑦ /proc/cpuinfo 파일
+리눅스 서버의 CPU 정보가 들어 있다. CPU 의 타입, 모델, 제조회사, 성능 등에 관한 정보를 알려 준다.
+
+# cat /proc/cpuinfo  /* # dmesg | grep -i cpu */
+processor       : 0
+vendor_id       : AuthenticAMD
+cpu family      : 16
+model           : 5
+model name      : AMD Athlon(tm) II X4 620 Processor
+stepping        : 2
+cpu MHz         : 2600.210
+cache size      : 512 KB
+....
+⑧ /proc/meminfo 파일
+메모리 사용량에 관한 정보를 보여 준다. 실제 메모리뿐만 아니라 가상 메모리까지 모두 확인할 수 있다. 
+
+# cat /proc/meminfo  /* # dmesg | grep -i mem ,# free */
+MemTotal:       515340 kB
+MemFree:         27556 kB
+Buffers:         27348 kB
+Cached:         343184 kB
+SwapCached:          0 kB
+....
+⑨ /proc/modules 파일 
+커널 모듈에 대한 정보를 확인 할 수 있다. 디바이스 된 장치의 드라이브를 확인할 때 이더넷 카드를 인식시킬 때 내렸던 lsmod 명령처럼 현재 커널 메모리에 올려서 사용하고 있는 모듈에 대한 정보를 확인 할 수 있다.
+
+# cat /proc/modules /* # lsmod */
+autofs4 29253 3 - Live 0xe0cf2000
+hidp 23105 2 - Live 0xe0c95000
+rfcomm 42457 0 - Live 0xe0c5f000
+l2cap 29505 10 hidp,rfcomm, Live 0xe0c8c000
+bluetooth 53925 5 hidp,rfcomm,l2cap, Live 0xe0cd9000
+....
+⑩ /proc/dma 파일
+현재 어느 DMA 채널이 사용 중인지를 알려 준다. 주로 사운드 카드를 설정할 때 확인하는 부분이다. DMA는 CPU를 통하지 않고 하드웨어와 메모리 사이에 데이터를 직접 전송시켜 고속으로 데이터를 전송하는 방식이다. 플로피 디스크와 같은 방식의 데이터 전송방식을 말한다.
+
+# cat /proc/dma
+2: floppy
+ 4: cascade
+....
+
+```
+
+[참고] DMA의 개념
+
+```bash
+DMA (Direct Memory Access) ; 메모리 직접 참조 
+
+DMA[디에메이]는 부착된 주변장치 (하드디스크 드라이브 등)로부터 컴퓨터 마더보드 상의 메모리로 데이터를 직접 보낼 수 있는 몇몇 컴퓨터의 버스의 기능이다. 이때, 마이크로프로세서는 데이터 전송에 관여하지 않으므로, 전체적인 컴퓨터 성능이 높아진다. 
+
+대개, 메모리의 일정 부분이 DMA에 사용될 영역으로 지정된다. ISA 버스 표준에서는, 최고 16 MB까지의 메모리가 DMA를 위해 주소 지정될 수 있다. EISA와 MCA 표준은 전체범위의 메모리 주소에 액세스를 허용한다 (그것들이 32 비트 주소지정이 가능하다는 전제하에). PCI는 마이크로프로세서가 PCI 콘트롤러에 입출력제어를 위임하는 버스 마스터링을 사용하여 DMA를 성취한다. 
+
+DMA의 대안으로서, PIO 인터페이스가 있는데, 이는 장치들 간에 전송된 모든 데이터가 프로세서를 거쳐가는 것이다. ATA/IDE 인터페이스를 위한 새로운 프로토콜이 Ultra DMA/33인데, 집중모드에서는 초당 33 MB까지의 데이터를 전송할 수 있다. Ultra DMA/33과 함께 딸려오는 하드드라이브는 PIO 모드 1, 3, 그리고 4와 멀티워드 DMA 모드 2 (초당 16 MB)를 함께 지원한다. 
+
+쉬운 설명] DMA 컨트롤러는 입출력장치와 관련된 개념이다. 일반적으로 이러한 입출력 창치는 직접 시스템 버스에 접속되지 않는데, 그 이유는 입출력 장치가 다양하고, 각기 전송속도의 차이가 나며, 데이터의 형식과 길이가 다르기 때문이다. 그래서 입출력 장치를 제어하기 위해서는 입출력 제어기가 필요하고, 입출력 제어기는 입출력 장치의 제어와 타이밍을 조절하는 역할을 하며, CPU와 입출력 장치의 통신을 담당하게 된다. 또한 데이터의 버퍼링이나 오류를 검출하는 역할을 수행하는데, 물론 CPU는 해당 입출력 제어기를 통하여 입출력 동작을 수행한다. 그런면에서 DMA는 넓은 의미로 입출력 제어기의 범위로 이해하기도 한다.
+```
+
+```bash
+⑪ /proc/ide 디렉토리
+이 디렉토리에는 IDE 인터페이스와 연결된 IDE 기기들에 대한 정보가 파일 형태로 들어 있다. 대표적인 IDE 기기로 하드디스크를 들 수 있다. ide 디렉토리에 있는 hdc 디렉토리에는 하드디스크에 대한 정보가 저장되어 있다.  /proc/ide/ide1/hdc 디렉토리에서 cat model이라는 명령을 내리면 하드디스크의 모델 이름을 표시해 준다.
+
+# ls -l /proc/ide/ide1
+-r--r--r-- 1 root root 0  5월 24 17:55 drivers
+lrwxrwxrwx 1 root root 8  5월 24 17:55 hdc -> ide1/hdc
+dr-xr-xr-x 3 root root 0  5월 24 17:55 ide1
+# cat /proc/ide/ide1/hdc/model
+VMware Virtual IDE CDROM Drive
+⑫ /proc/uptime 파일
+시스템이 얼마나 오래 동작했는지에 대한 정보를 저장하고 있는 파일이다. 
+
+# cat /proc/uptime         /* # uptime */
+128847.80 124604.75
+# uptime
+18:37:16 up 1 day, 11:45,  5 users,  load average: 0.00, 0.00, 0.00
+```
+
+**■ /var 디렉토리**
+
+/var 디렉토리는 시스템에서 사용되는 가변적인 파일들이 저장된다. 각종 시스템 로그파일, 사용자 로그인에 대한 보안 기록, 그리고 만약 시스템에 메일 서버를 운영한다면 사용자들에게 전송된 메일들을 임시로 저장한다. 레드햇 7.0에서부터 /var 디렉토리의 용도에 대한 변경 내용이 있다. 과거에는 /home 디렉토리에 저장되던 /home/ httpd 디렉토리가 /var/www 로 이름이 변경되어 저장된다. 또한 /home/ftp 디렉토리가 /var/ftp로 변경되었다. /var 디렉토리를 좀 더 자세하게 살펴보면 다음과 같다.
+
+```bash
+① /var/log 디렉토리
+프로그램들의 로그 파일들이 저장되는 디렉토리이다. 이 디렉토리에서 중요한 파일은 wtmp와 messages 파일이다. 이들은 각각 login과 syslog의 로그 파일들이다. wtmp는 시스템의 모든 사용자 로그인과 로그아웃에 대한 정보를 저장하고 있는 파일이고, messages는 커널과 시스템의 모든 출력 메시지를 저장하고 있는 파일이다. /var/log 안의 파일들은 시스템의 사용량에 따라 그 크기가 무한대로 증가할 수 있으므로 정기적으로 파일들을 삭제하는 등 디렉토리 관리가 필요하다.
+
+# tail /var/log/messages   (# gnome-system-log)
+Jan  7 13:02:36 linux249 avahi-daemon[4022]: Received response from host 172.16.6.26 with invalid source port 52450 on interface 'eth0.0'
+Jan  7 13:02:36 linux249 avahi-daemon[4022]: Received response from host 172.16.6.26 with invalid source port 52450 on interface 'eth0.0'
+Jan  7 13:02:36 linux249 avahi-daemon[4022]: Invalid legacy unicast query packet.
+Jan  7 13:02:37 linux249 avahi-daemon[4022]: Invalid legacy unicast query packet.
+Jan  7 13:02:37 linux249 avahi-daemon[4022]: Received response from host 172.16.8.103 with invalid source port 59480 on interface 'eth0.0'
+Jan  7 13:02:37 linux249 avahi-daemon[4022]: Invalid legacy unicast query packet.
+Jan  7 13:02:37 linux249 avahi-daemon[4022]: Received response from host 172.16.6.26 with invalid source port 52450 on interface 'eth0.0'
+Jan  7 13:02:40 linux249 last message repeated 6 times
+Jan  7 13:02:53 linux249 avahi-daemon[4022]: Received response from host 172.16.8.105 with invalid source port 64324 on interface 'eth0.0'
+Jan  7 13:05:35 linux249 avahi-daemon[4022]: Invalid query packet.
+② /var/run 디렉토리
+시스템의 현재 정보들을 저장하고 있는 디렉토리이다. 간단하게 /var/run/atd.pid 파일의 경우에는 현재 사용 중인 atd 데몬의 프로세스번호를 저장하고 있다.
+
+# ps -ef | grep atd
+root      2480     1  0 May23 ?        00:00:00 rpc.statd
+root      2881     1  0 May23 ?        00:00:00 /usr/sbin/atd
+# cat /var/run/atd.pid
+2881
+③ /var/spool 디렉토리
+메일이나 뉴스, 프린터 큐 등과 같은 시스템 상에서 대기 상태에 있는 작업들을 위한 디렉토리이다. 각각의 대기 작업들은 모두 /var/spool 아래 고유의 디렉토리에 위치하게 된다. 예를 들어 시스템의 계정 사용자들의 메일은 /var/spool/mail에 저장된다.
+
+# ls /var/spool/mail
+FEDORA  fedora  root  user01
+```
+
+**■ /tmp 디렉토리**
+
+디렉토리 이름에서도 알 수 있듯이 임시 파일들을 위한 디렉토리이다. 이 디렉토리는 프로그램들이 사용하는 임시파일들이 생성되는 디렉토리이다. /tmp 디렉토리안의 내용은 재부팅 되면 삭제되고 부팅이 되면서 다시 생성이 된다.
+
+```bash
+# ls -al /tmp
+VMwareDnD/       scim-bridge-0.3.0.lockfile-0@localhost:0.0  ssh-gWLtvP4408/
+gconfd-root/     scim-bridge-0.3.0.socket-0@localhost:0.0=   virtual-root.wQlgkr/
+keyring-YT6EqU/  scim-helper-manager-socket-root=            vmware-config0/
+mapping-root=    scim-panel-socket:0-root=                   vmware-root/
+orbit-root/      scim-socket-frontend-root=                  vmware-root-1983851911
+```
+
+---
+
+LINUX II 과정 전용 머신 구성하기
+
+- 기본 리눅스 설치와 동일하다.
+- boot.iso 파일을 사용하여 네트워크 설치를 진행한다.
+- 파티션 설정 부분만 차이가 있으며 이 부분만 신경써주면 된다.
+
+## 파티션 변경
+
+파티션 수동설정
+
+파티션 타입을 Standard Partition으로 선택
+
+## 리눅스 머신 설치
+
+기존의 가상머신들은 삭제를 한다.
+
+### 가상머신 설정 파일 구성
+
+가상머신을 만드는 단계는 동일하다. 
+
+
+
+# 파티션 부분 설정
+
+- 펼침
+
+네트워크 구성
+
+- 펼침
+
+설치 완료
+
+### 기본 정보 조회
+
+```bash
+# uname -a
+# ls -l /etc/*release
+# cat /etc/redhat-release
+# ip a
+# who -r
+```
+
+### SERVER1
+
+```bash
+[root@server1 ~]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+# vi /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.10.200	server1.example.com	server1
+192.168.10.252	server2.example.com	server2
+
+확인
+# ping server1
+# ping server1.example.com
+```
+
+```bash
+# cat /root/.bashrc
+# .bashrc
+
+# User specific aliases and functions
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias cdt='cd /test'
+alias rmt='cd /test && rm -rf *'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+#. .bashrc
+# cdt
+# rmt
+```
+
+```bash
+# dnf list | grep epel
+# dnf info epel-release
+/* epel은 필수 설치! */
+
+# dnf -y install epel*
+# dnf repolist
+# dnf list
+# dnf -y install bash-completion       /* 7버전 이하에선 bash completion 이 두개 있는데 둘 다 설치해줘야한다 */
+# init 6
+# dnf -y install gcc
+# dnf -y install net-tools             /* ifconfig 사용을 위해 */
+# dnf -y install man-db-cron           /* man 파일 설치 */
+# cd /etc/cron.daily/
+# ls
+logrotate  man-db.cron
+# ./man-db.cron
+# dnf config-manager powertools --set-enabled
+# dnf repolist
+repo id                                               repo name
+appstream                                             CentOS Linux 8 - AppStream
+baseos                                                CentOS Linux 8 - BaseOS
+epel                                                  Extra Packages for Enterprise Linux 8 - x86_64
+epel-modular                                          Extra Packages for Enterprise Linux Modular 8 - x86_64
+extras                                                CentOS Linux 8 - Extras
+powertools                                            CentOS Linux 8 - PowerTools
+# dnf list
+# dnf -y install bind-utils
+# dnf -y install firewall-config
+# rpm -qa | wc -l
+467
+# ping server2
+# ping server1
+# > .bash_history
+# rm -rf .ssh/
+# history -c
+# init 0
+스냅샷 구성
+```
+
+### SERVER2
+
+```bash
+[root@server1 ~]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+# vi /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.10.200	server1.example.com	server1
+192.168.10.252	server2.example.com	server2
+
+확인
+# ping server1
+# ping server1.example.com
+```
+
+```bash
+# dnf list | grep epel
+# dnf info epel-release
+/* epel은 필수 설치! */
+
+# dnf -y install epel*
+# dnf repolist
+# dnf list
+# dnf -y install bash-completion       /* 7버전 이하에선 bash completion 이 두개 있는데 둘 다 설치해줘야한다 */
+# init 6
+# dnf -y install gcc
+# dnf -y install net-tools             /* ifconfig 사용을 위해 */
+# dnf -y install man-db-cron           /* man 파일 설치 */
+# cd /etc/cron.daily/
+# ls
+logrotate  man-db.cron
+# ./man-db.cron
+# dnf config-manager powertools --set-enabled
+# dnf repolist
+repo id                                               repo name
+appstream                                             CentOS Linux 8 - AppStream
+baseos                                                CentOS Linux 8 - BaseOS
+epel                                                  Extra Packages for Enterprise Linux 8 - x86_64
+epel-modular                                          Extra Packages for Enterprise Linux Modular 8 - x86_64
+extras                                                CentOS Linux 8 - Extras
+powertools                                            CentOS Linux 8 - PowerTools
+# dnf list
+# dnf -y install bind-utils
+# dnf -y install firewall-config
+# rpm -qa | wc -l
+467
+# ping server2
+# ping server1
+# > .bash_history
+# rm -rf .ssh/
+# history -c
+# init 0
+스냅샷 구성
+```
+
+# 마지막 설정
+
+```bash
+스냅샷 작업전에 DVD 해제
+메모리, CPU 구성 확인
+스냅샷 작업
+
+```
+
+# 장치 인식부터 마운트까지의 디스크 관리
+
+스토리지: 저장공간
+
+→ 디스크
+
+DAS : direct attached storage
+
+internal : 서버 자체에 설치되는 디스크
+
+external : 외장 하드
+
+usb-a 2.0, usb-a 3.0, usb - c (3.1)
+
+제일 간편하다
+
+확장성의 단점
+
+F/S NTFS, xfs, ext 2 3 4, btrfs.., apfs?
+
+NAS : network attached storage (TCP/IP) 파일 형식으로 전송
+
+internal : 폐쇄망에서 사용되는 nas
+
+external : 외부망에서 사용되는 nas
+
+네트워크를 통하여 데이터를 관리, 보관, 전송
+
+이기종간에도 파일 전송 가능
+
+네트워크 속도의 영향을 받지만 das보다 속도가 월등히 빠르다
+
+보안에 대한 이슈
+
+TCP/IP 네트워크 패킷을 처리하는 시간적인 요소가 추가
+
+SAN : stotrage area network
+
+FC : 프로토콜
+
+SAN switch - zonning
+
+gbic
+
+HBA
+
+# 단원목표
+
+---
+
+- 디스크의 물리적 구조
+- SSD NVMe
+- 하드웨어 정보 확인하는 방법
+- 물리적 장치의 인식
+- scsi , nvme장치 인식후 구별 및 식별
+- 파티션 작업
+- 파일시스템 포맷
+- 마운트 작업
+- 오버마운트 주의사항
+- fstab 파일 작성
+- quata (용량제한) 구성
+
+---
+
+# 디스크 작업
+
+---
+
+- 장치인식
+- 파티션 작업
+- 파일시스템 작업
+- 마운트 작업
+
+---
+
+# 디스크의 물리적 구조
+
+---
+
+- 원판형 디스크의 구조
+
+    ## 디스크의 물리적인 구조
+
+    흔히 사용하는 S-ATA 디스크를 분해하였을때는 다음과 같은 모양으로 나타나게 된다.
+
+    ▪ 스핀들(Spindle) : 플래터를 돌러주는 축
+
+    ▪ 스핀들모터 - 스핀들과 완벽하게 물려있어 스핀들을 회전시켜 스핀들과 함께 플래터를 회전 시키는 역할을 한다.
+
+    ▪ 플래터(Platters) : 원판(플랫터), 데이터가 저장되는 공간
+
+    ▪ 헤드(Heads) : 데이터를 읽어들이는 부분
+
+    ▪ 헤드 암(Head actuator arm) : 데이터를 읽어 들이는 팔
+
+    ### 디스크의 내부 논리적 구조
+
+    ---
+
+IDE
+
+S-ATA
+
+SCSI
+
+SAS
+
+SSD
+
+NVme
+
+PCI storage
+
+# 디스크이름과 파티션 이름
+
+---
+
+- **디스크이름**
+
+    **SCSI DISK**
+
+    **/dev/sda /dev/sdb /dev/sdc ….**
+
+    **IDE DISK ( 이전에 사용하던 디스크 방식)**
+
+    /dev/hda /dev/hdb /dev/hdc
+
+    **Nvme DISK**
+
+    /dev/nvme0 /dev/nvme1 /dev/nvme2
+
+    **가상디스크** 
+
+    /dev/vda /dev/vdb /dev/vdc
+
+    **가상디스크 버전 업**
+
+    /dev/xvda /dev/xvdb /dev/xvdc
+
+- **파티션이름**
+
+    **Primaty Patition(1-4)         주파티션**
+
+    **Extended Partition(5-15) 확장파티션**
+
+    **Logical Patition                     논리파티션**
+
+- **리눅스 최대 파티션 개수**
+
+    **SCSI DISK(15 partitions per SCSI Driver) : /dev/sda1~15**
+
+---
+
+## 파티션에 대한 이해
+
+**[1] 파티션이란?**
+
+컴퓨터에서 디스크나 메모리 등의 저장 매체를 사용하고자 하는 **영역만큼 나누는 것을 말한다.** 하드 디스크 드라이브처럼 **용량이 비교적 큰 저장** 매체를 `유용하게 쓰기 위해` 고안되었다. 즉, 하드 디스크 드라이브에 새로운 프로그램을 계속 설치하면 디렉토리로 관리하는 데 한계가 생기며, 컴퓨터 바이러스에 감염될 경우 모든 프로그램과 데이터들을 사용하지 못하게 될 수도 있다. 이에 대비하여 하드 디스크드라이브를 나눠 놓으면 프로그램을 별도로 저장할 수 있으며, 컴퓨터바이러스에 감염되더라도 그 부분만 제거할 수가 있다.
+
+**[2] 파티션을 나누는 이유?**
+
+**① 루트 파티션 파괴시 다중 파티션 자료보호 & 자료 백업 및 업그레이드 수월**
+
+리눅스가 설치된 파티션 이외의 파티션에 자료가 들어 있는 파티션의 경우 리눅스가 설치된 파티션을 포맷하여도 다른 파티션에는 영향이 미치지 않기 때문에 데이터를 보호 할 수 있다. 단일 파티션의 경우 데이터 백업 시 별도의 파티션을 필요로 하지만 다중 파티션의 경우 별도의 파티션 없이 다중의 파티션 중 다른 하나의 파티션을 선택하여 백업 할 수 있고, 파티션 용량이 부족할 때 새로운 파티션으로 대체하여 사용 가능하기 때문에 용량 부족 시 업그레이드가 수월하다.
+
+**② 다중 운영체제 설치시 다중 파티션 필요**
+
+각각의 운영체제가 설치될 공간은 독립적인 공간이어야 하므로, 이러한 공간을 만들기 위해 파티션을 나누는 작업이 필요하게 된다. 또한, 하나의 디스크에 여러 개의 운영체제를 사용하는 경우에 운영체제는 하드디스크를 직접 다루는 것이 아니라 하드디스크의 파티션을 제어하므로 각 운영체제에 알맞은 파일시스템 형식이 각각 있어야 한다.
+
+**③ 파일 시스템 점검 시간을 줄여 부팅시간 감소**
+
+1. 리눅스 시스템 부팅 시 fsck 유틸리티에 의해 파일 시스템 점검이 이뤄지게 되는데, 하나의 파티션이 아닌 여러 개의 파티션으로 분할되는 경우 체크여부를 선택 할 수 있으므로 점검 시간이 빠르게 된다.
+2. 파일시스템이 깨진 경우 하나의 파티션으로 분할 시 모든 내용을 복구해야 되서 많은 시간이 걸리는 반면 파티션이 분할되어 있으면, 깨진 파일시스템의 파티션만 복구 하면 되므로 부팅 시 시간이 단축 된다.
+3. 부팅 이후 파일 시스템에 문제 발생 시 문제가 발생된 파티션 언마운트하여 시스템을 검사하여 복구 할 수 있다.
+
+## 리눅스 파티션 표시법
+
+SCSI 컨트롤러에 연결되어 있는 순서에 따라 하드디스크를 표현
+
+```bash
+IDE
+                          Window         Linux 
+Primary master HardDisk   disk0          /dev/hda
+Primary slave HardDisk    disk1          /dev/hdb
+Secondary master HardDisk disk2          /dev/hdc
+Secondary slave HardDisk  disk3          /dev/hdd
+
+SCSI
+                          Window         Linux 
+Primary master HardDisk   disk0          /dev/sda
+Primary slave HardDisk    disk1          /dev/sdb
+Secondary master HardDisk disk2          /dev/sdc
+Secondary slave HardDisk  disk3          /dev/sdd
+```
+
+**[1] 윈도우 (A ~ Z드라이브까지 할당 가능)** 
+
+- hard disk와 partition이 여러 개로 나눠진 경우 C, D, E....등 드라이브로 구분
+
+**[2]  리눅스 (최대 16개 - 주 파티션 3+ 확장 파티션 1 + 논리 파티션 12(권장))**
+
+윈도우와 같이 드라이브가 아닌 디렉토리로 파티션을 구분한다. 실제로 파티션이 분할되어 있어도 **" / "**디렉토리(최상위 디렉토리) 아래에 하위 디렉토리로 표시되어 진다.
+
+```bash
+             리눅스의 partition구분법
+
+/dev/sda1    Primary master하드디스크 첫 번째 파티
+/dev/sda2    Primary master하드디스크 두 번째 파티션
+/dev/sdb1    Primary slave하드디스크 첫 번째 파티션
+/dev/sdb2    Primary slave하드디스크 두 번째 파티션
+
+[참고] 파티션을 나누게 되면 하드디스크를 '/dev/sd?'이므로 '/dev/sd?'에 숫자를 붙여서 구분하게 된다.
+```
+
+## 파티션 종류와 설명
+
+파티션 분할시 파티션 제약이 따르게 되는데 분할된 파티션의 정보를 담고 있는 파티션 테이블의 용량이 제한되어 있기 때문에 하나의 하드디스크로 만들 수 있는 주 파티션의 개수는 최대 4개이다. 이러한 제한을 극복하기 위해서 등장한 것이 확장 파티션과 논리 파티션이다. 주 파티션 네 개에서 더 많은 파티션이 필요한 경우 네 개의 파티션 중 하나를 확장 파티션으로 그 안에 논리 파티션 (hda5, hda6, hda7...)을 만들 수 있다. 주 파티션 및 확장 파티션의 경우 1부터 4까지의 파티션을 가지며, 5부터의 파티션은 그 하드디스크의 논리 파티션을 의미한다.
+
+```bash
+파티션                    설명
+주 파티션           주파티션(Primary Partition), 기본 파티션으로 더 이상 쪼갤 수 없는 파티션이다. 
+									하나의 하드디스크에는 주 파티션과 확장 파티션을 네 개까지만 만들 수 있다는 제한이 있다. 
+									네 개 이상의 파티션이 필요한 경우 확장 파티션을 만들어 그 안에 논리 파티션을 두게 된다.
+확장 파티션          확장 파티션(Extended Partition),
+									하드 디스크를 여러 개의 파티션으로 나누고자 할 때 만드는 파티션이다.
+	                확장 파티션은 저장 공간이 없으며, 안에 논리 파티션을 만들 수 있게 해주는 커다란 그릇 역할만 한다.
+							    확장 파티션은 디스크에 Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        3.9G     0  3.9G   0% /dev
+tmpfs           3.9G     0  3.9G   0% /dev/shm
+tmpfs           3.9G   10M  3.9G   1% /run
+tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+/dev/sda6        43G  4.2G   39G  10% /
+/dev/sda3       5.0G   69M  5.0G   2% /home
+/dev/sda1       2.0G  126M  1.7G   7% /boot
+/dev/sda2        47G  1.2G   46G   3% /var
+tmpfs           795M  1.2M  794M   1% /run/user/42
+tmpfs           795M  4.6M  791M   1% /run/user/0하나만 만들 수 있다. (ex - hda4)
+논리 파티션          논리적인 파티션(Logical Partition),
+                  네 개 이상의 파티션을 사용하게 되는 경우 sda4를 확장 파티션으로 지정하여 논리 파티션을 만들게 된다.
+```
+
+### [EX1] 현재 운영체제 파티션 구성 정보 확인
+
+```bash
+■ 디스크의 종류: IDE(SATA), SCSI(SAS), SSD ,
+
+         ---------------------+-----------------------
+                IDE(SATA)     |       SCSI(SAS)
+         ---------------------+-----------------------
+ 안정성
+ 성  능
+ 확장성
+ 가  격
+         ---------------------+-----------------------
+
+■ IDE   ---> /dev/hd  ----> /dev/hda, /dev/hdb, /dev/hdc, /dev/hdd
+■ SCSI  ---> /dev/sd  ----> /dev/sda, /dev/sdb, /dev/sdc, ....
+```
+
+```bash
+# df –h     (# fdisk –l)
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        3.9G     0  3.9G   0% /dev
+tmpfs           3.9G     0  3.9G   0% /dev/shm
+tmpfs           3.9G   10M  3.9G   1% /run
+tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+/dev/sda6        43G  4.2G   39G  10% /
+/dev/sda3       5.0G   69M  5.0G   2% /home
+/dev/sda1       2.0G  126M  1.7G   7% /boot
+/dev/sda2        47G  1.2G   46G   3% /var
+tmpfs           795M  1.2M  794M   1% /run/user/42
+tmpfs           795M  4.6M  791M   1% /run/user/0
+# cat /proc/swaps
+Filename				Type		  Size	  Used	Priority
+/dev/sda5       partition	4194300	      -2
+```
+
+# 실습용 파티션 구조 확인
+
+```bash
+# df | grep sda
+/dev/sda6       44471076 4350600  40120476  10% /
+/dev/sda3        5232640   69724   5162916   2% /home
+/dev/sda1        1998672  128680   1748752   7% /boot
+/dev/sda2       48803552  607168  48196384   2% /var
+```
+
+[참고] tmpfs
+
+```bash
+tmpfs는 수많은 유닉스 계열 운영 체제의 임시 파일 스토리지 기능을 일컫는 이름이다. 마운트된 파일 시스템처럼 보이지만 영구적인 기억 장치가 아닌 휘발성 메모리에 저장된다. 가상 디스크 드라이브처럼 보이면서도 디스크 파일 시스템을 호스팅하는 램 디스크와 구조가 비슷하다.
+
+tmpfs는 리눅스 커널 버전 2.4 이상부터 지원한다.tmpfs (과거 이름: shmfs)는 시동 중 사용되는 ramfs 코드에 기반을 두며 페이지 캐시를 사용하지만, ramfs와는 달리 덜 사용되는 페이지들을 스왑 공간으로 스왑 아웃 처리를 지원하며, 메모리 부족 상황을 피하기 위해 파일 시스템 크기와 inode 제한을 지원한다. (각각, 기본적으로 물리 RAM의 절반, RAM 페이지 수의 절반) 이러한 옵션들은 마운트 시에 설정되며 파일 시스템을 다시 마운트함으로써 수정할 수 있다
+
+tmpfs와 유사한 기능이 있는데 ramdisk이다. 
+이것은 디스크를 마운트 하는것과 동일하게 디렉토리를 하나 생성하여 별도로 마운트 해준다면 디렉토리를 ramdisk로 사용할 수 있는 것이다.
+
+tmpfs와 ramdisk의 차이점은 지정된 크기를 넘어섰을때 작동 방식에 있다. 
+일정공간을 지정해서 사용하고 있을때 tmpfs는 넘어서는 데이터에 대하여 저장하지 않고 에러를 출력합니다. 
+
+하지만, ramdisk는 이에 대한 예외를 지원하지 않고 저장한다. 만일 2G의 메모리가 존재하는데 2G넘는 데이터가 메모리에 담겨진다면 어떻게 될까? swap을 사용하다가 말미에는 더이상 서버가 제구실을 하지 못하고 해당 데이터를 잃어버리는 사태가 벌어지게된다. 
+
+이와같은 차이점을 감안하면 ramdisk보다는 tmpfs가 더 나은 선택이 될 수 있다.
+```
+
+# 장치인식 (Device Reconfiguration)
+
+---
+
+- **장치 추가**
+
+    **Rescan > find > echo “- - -” ~~**
+
+- 추가된 디스크 확인
+
+    ```bash
+    # ls –l /dev/sd?
+    # lsscsi
+    # fdisk -l
+    ```
+
+---
+
+## 장치 추가 후 인식 방법
+
+**■ 새로운 디스크 추가 작업 절차**
+
+vmware의 추가 디스크 장착
+
+서버를 종료하지 않고 추가한다.
+
+VM > Setting > add > hard disk > SCSI > create a new virtual machine > 2G > OK
+
+- 디스크 추가 절차
+
+서버는 **온라인 상태**에서 디스크를 재인식 하고 사용이 가능해야 한다. 서비스중에 디스크를 추가하는 경우가 많은데 추가 하는 경우마다 재부팅을 한다면 어떤 사용자도 좋아하지 않을 것이다. 해당 명령어들을 숙지하여 서버가 운용상태에 있더라도 디스크를 추가할수 있도록 하자.
+
+리눅스 서버의 PCI 버스 및 이에 연결된 PCI 디바이스 정보를 보기 위해 사용한다.
+
+LSI Logic에 장착되어 있는 것을 확인할수 있으며 이는 표준 디바이스를 뜻한다.
+
+### [EX1] 디스크 추가후 장치 인식
+
+```bash
+# ls -l /dev | grep ^b
+brw-rw----. 1 root disk      8,   0 Dec 16 15:02 sda
+brw-rw----. 1 root disk      8,   1 Dec 16 15:02 sda1
+brw-rw----. 1 root disk      8,   2 Dec 16 15:02 sda2
+brw-rw----. 1 root disk      8,   3 Dec 16 15:02 sda3
+brw-rw----. 1 root disk      8,   4 Dec 16 15:02 sda4
+brw-rw----. 1 root disk      8,   5 Dec 16 15:02 sda5
+brw-rw----. 1 root disk      8,   6 Dec 16 15:02 sda6
+brw-rw----. 1 root cdrom    11,   0 Dec 16 15:02 sr0
+
+현재 장착되어 있는 블록디바이스 확인
+# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda      8:0    0  100G  0 disk 
+├─sda1   8:1    0    2G  0 part [SWAP]
+├─sda2   8:2    0  500M  0 part /data1
+├─sda3   8:3    0  500M  0 part /data2
+├─sda4   8:4    0    1K  0 part 
+├─sda5   8:5    0  500M  0 part /data3
+├─sda6   8:6    0  500M  0 part /data4
+├─sda7   8:7    0  500M  0 part /home
+└─sda8   8:8    0 95.6G  0 part /
+
+# lspci | grep -i scsi
+00:10.0 SCSI storage controller: LSI Logic / Symbios Logic 53c1030 PCI-X Fusion-MPT Dual Ultra320 SCSI (rev 01)   ********
+
+시스템에 부착된 SCSI 디바이스를 확인하기 위하여 사용하는 명령어이다.
+# lsscsi
+**[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda** 
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+관련 옵션 보기
+
+# lsscsi -d 디바이스에 대한 major, minor 번호를 같이 보여준다.
+[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda [8:0]
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0 [11:0]
+# lsscsi –l 디바이스에 대한 세부 정보를 같이 보여준다.
+[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda 
+  state=running queue_depth=32 scsi_level=3 type=0 device_blocked=0 timeout=180
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0 
+  state=running queue_depth=1 scsi_level=6 type=5 device_blocked=0 timeout=30
+# lsscsi –g 디바이스에 대한 generic device name을 같이 보여준다.
+[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda   /dev/sg0 
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0   /dev/sg1
+
+[0:0:0:0]의 의미
+H : Host Adapter ID
+C : SCSI Channel on Host Adapter
+T : ID
+L : LUN
+lspci –tv를 이용하여 scsi I/O의 정보를 확인한다.
+
+# lspci –tv
+-[0000:00]-+-00.0  Intel Corporation 440BX/ZX/DX - 82443BX/ZX/DX Host bridge
+           +-01.0-[01]--
+           +-07.0  Intel Corporation 82371AB/EB/MB PIIX4 ISA
+           +-07.1  Intel Corporation 82371AB/EB/MB PIIX4 IDE
+           +-07.3  Intel Corporation 82371AB/EB/MB PIIX4 ACPI
+           +-07.7  VMware Virtual Machine Communication Interface
+           +-0f.0  VMware SVGA II Adapter
+           **+-10.0  LSI Logic / Symbios Logic 53c1030 PCI-X Fusion-MPT Dual Ultra320 SCSI   ***********************
+           +-11.0-[02]--+-00.0  VMware USB1.1 UHCI Controller
+           |            +-01.0  Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)
+           |            +-02.0  Intel Corporation 82545EM Gigabit Ethernet Controller (Copper)
+           |            +-03.0  Ensoniq ES1371/ES1373 / Creative Labs CT2518
+           |            \-04.0  VMware USB2 EHCI Controller
+           +-15.0-[03]--
+           +-15.1-[04]--
+           +-15.2-[05]--
+           +-15.3-[06]--
+           +-15.4-[07]--
+           +-15.5-[08]--
+           +-15.6-[09]--
+           +-15.7-[0a]--
+           +-16.0-[0b]--
+           +-16.1-[0c]--
+           +-16.2-[0d]--
+           +-16.3-[0e]--
+           +-16.4-[0f]--
+           +-16.5-[10]--
+           +-16.6-[11]--
+           +-16.7-[12]--
+           +-17.0-[13]--
+           +-17.1-[14]--
+           +-17.2-[15]--
+           +-17.3-[16]--
+           +-17.4-[17]--
+           +-17.5-[18]--
+           +-17.6-[19]--
+           +-17.7-[1a]--
+           +-18.0-[1b]--
+           +-18.1-[1c]--
+           +-18.2-[1d]--
+           +-18.3-[1e]--
+           +-18.4-[1f]--
+           +-18.5-[20]--
+           +-18.6-[21]--
+           \-18.7-[22]--
+디스크 디바이스의 재 검색을 위하여 scan 파일을 사용하는데 해당 파일의 위치를 탐색한다.
+
+# find /sys/devices -name scan -exec ls -l {} \;
+--w-------. 1 root root 4096 Mar 18 19:13 /sys/devices/pci0000:00/0000:00:07.1/ata1/host1/scsi_host/host1/scan
+--w-------. 1 root root 4096 Mar 18 19:13 /sys/devices/pci0000:00/0000:00:07.1/ata2/host2/scsi_host/host2/scan
+--w-------. 1 root root 4096 Mar 18 19:13 /sys/devices/pci0000:00/0000:00:10.0/host0/scsi_host/host0/scan
+비교를 해보니 /sys/devices/pci0000:00/0000:00:10.0/host0/scsi_host/host0/scan파일이 관련이 있는 파일로 확인된다.
+# find /sys/devices/ -name scan | grep "00:10.0"
+
+# lsscsi
+[1:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+[2:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda  **
+
+해당 명령어의 형식으로 스캔된 파일을 추가해준다.
+echo "- - -" > 스캔파일명
+해당 값들은["- - -"] 와일드 카드로 대체되어 본래의 pci 카드 연결 값이 입력된다.
+
+# echo "- - -" > /sys/devices/pci0000:00/0000:00:10.0/host0/scsi_host/host0/scan
+
+# lsscsi
+[1:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+[2:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda
+[2:0:1:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sdb < 추가된 디스크
+정상적으로 추가 되었다.
+
+echo에서 사용한 “- - -”에 들어가는 인자값은 뒤의 인수에서 자동으로 추가된다.
+해당 값을 알아보자.
+첫 번째 기호 : Channel Number
+두 번째 기호 : SCSI Target ID
+세 번째 기호 : LUN Values
+자세한 내용은 여기에 :
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/online_storage_reconfiguration_guide/scanning-storage-interconnects
+
+해당 방법을 사용하여 추가로 디스크를 하나 더 장착하고 아래 표처럼 표시되어야 한다.
+[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda 
+[0:0:1:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sdb 
+[0:0:2:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sdc 
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+디스크 삭제하기
+마지막에 추가한 디스크를 VM에서 삭제한다.
+
+# echo 1 > /sys/block/**sdc**/device/delete : 블록 디바이스의 이름을 정확히 지정해야 한다.
+
+# lsscsi
+[0:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda 
+[0:0:1:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sdb 
+[2:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+```
+
+장치 인식 연결 해제
+
+```bash
+# find /sys/block
+/sys/block
+/sys/block/sdb
+/sys/block/sr0
+/sys/block/sda
+# echo 1 > /sys/block/sdb/device/delete
+# lsscsi
+[1:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+[2:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda
+```
+
+장치 연결 했다 해제하기
+
+```bash
+# echo "- - -" > /sys/devices/pci0000:00/0000:00:10.0/host2/scsi_host/host2/scan    < 연결
+# lsscsi
+[1:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+[2:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda
+[2:0:1:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sdb
+# echo 1 > /sys/block/sdb/device/delete                                             < 해제
+# lsscsi
+[1:0:0:0]    cd/dvd  NECVMWar VMware IDE CDR10 1.00  /dev/sr0
+[2:0:0:0]    disk    VMware,  VMware Virtual S 1.0   /dev/sda
+```
