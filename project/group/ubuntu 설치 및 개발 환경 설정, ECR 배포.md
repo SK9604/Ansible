@@ -76,6 +76,11 @@
     go: creating new go.mod: module myapp.com/webhandler
     ```
 
+    ```bash
+    go env -w GO111MODULE=auto : 현재 디렉터리가 $GOPATH 외부에 있고 go.mod 파일이 포함된 경우 모듈을 사용하고 그렇지 않으면 $GOPATH의 패키지를 사용한다.
+    go mod init myapp.com/webhandler : 현재 디렉터리를 모듈의 루트로 만든다.
+    ```
+
 7. **개발툴 설치(Visual Studio Code)**
 
     ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/94c4b2ca-be53-4d76-b9b8-c6faa56b95d4/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/94c4b2ca-be53-4d76-b9b8-c6faa56b95d4/Untitled.png)
@@ -174,7 +179,7 @@
 
     ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/675a73d7-17b5-4a0e-ba79-9dd71fcec20f/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/675a73d7-17b5-4a0e-ba79-9dd71fcec20f/Untitled.png)
 
-    - 이후 **[에러 발생](https://www.notion.so/Ubuntu-59cf8e7cd5714d6e9b6ec077e032ea5a)**
+    - 이후 **[에러 발생](https://www.notion.so/Ubuntu-ECR-59cf8e7cd5714d6e9b6ec077e032ea5a)**
 11. **Dockerfile 생성 및 ECR 배포 Shell Script 작성**
 
     ```bash
