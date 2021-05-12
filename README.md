@@ -7,3 +7,4 @@ Soldesk K-digital 과정
 |---------|--------|
 | Linux | CentOS 8.2 |
 | VMware | VMware Workstation 15.5.6 |
+| AWS | console |
